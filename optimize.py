@@ -1,10 +1,24 @@
+from operator import add, sub, mul
 import ast
 import unittest
 
 # Optimization (constant folding) of AST
 
 def optimize(node):
-    return node
+    if isinstance(node, ast.Constant):
+        return node
+    elif isinstance(node, ast.Name):
+        return node
+    elif isinstance(node, ast.Expression):
+        return optimize(node.body)
+    elif isinstance(node, ast.BinOp):
+        a = optimize(node.left)
+        b = optimize(node.right)
+        # No need to do constant folding if either left or right is not a constant
+        if (not isinstance(a, ast.Constant) or not isinstance(b, ast.Constant)):
+            return ast.BinOp(a, node.op, b)
+        foldConstant = { ast.Add: add, ast.Sub: sub, ast.Mult: mul }.get(type(node.op))(a.value, b.value)
+        return ast.Constant(foldConstant)
 
 class TestOptimize(unittest.TestCase):
     def test_optimize(self):
