@@ -2,6 +2,7 @@ from collections import defaultdict
 from operator import add, sub, mul
 import ast
 import unittest
+from optimize import optimize
 
 # Generate fictional assembly by tree-walking an AST
 
@@ -81,9 +82,12 @@ class TestCodegen(unittest.TestCase):
             ('y + 1', (10, 0), 1),
             ('x + y + 1', (1, 2), 4),
             ('2 * ((x - 1) * (y + 2)) + x', (3, 5), 31),
+            ('1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + x + y', (9, 10), 55), 
         ]
         for s, (x, y), expected in test_cases:
             expr = ast.parse(s, mode='eval')
+            # Uncomment to turn on AST optimization
+            # expr = optimize(expr)
             # Uncomment to print AST for expression
             print(ast.dump(expr, indent=2))
             program = codegen(expr)
