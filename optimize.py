@@ -16,7 +16,9 @@ def optimize(node):
         b = optimize(node.right)
         # No need to do constant folding if either left or right is not a constant
         if (not isinstance(a, ast.Constant) or not isinstance(b, ast.Constant)):
-            return ast.BinOp(a, node.op, b)
+            node.left = a
+            node.right = b
+            return node
         foldConstant = { ast.Add: add, ast.Sub: sub, ast.Mult: mul }.get(type(node.op))(a.value, b.value)
         return ast.Constant(foldConstant)
 
