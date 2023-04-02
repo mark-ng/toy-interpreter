@@ -9,7 +9,24 @@ X_REGISTER = 'r1'
 Y_REGISTER = 'r2'
 
 def codegen(expr):
-    return []
+    registerMapping = { 'x': X_REGISTER, 'y': Y_REGISTER}
+    if isinstance(expr, ast.Name):
+        return [f"MOV %{registerMapping[expr.id]} %r0"]
+    elif isinstance(expr, ast.Constant):
+        return [f"MOV ${expr.value} %r0"]
+    elif isinstance(expr, ast.BinOp):
+        leftASM = codegen(expr.left)
+        rightASM = codegen(expr.right)
+        # Check if register already used in nested recursion
+        pickedRegisterNum = 3
+        while True:
+            if f"%r{pickedRegisterNum}" not in " ".join(leftASM + rightASM): break
+            pickedRegisterNum += 1
+        op_map = { ast.Add: "ADD", ast.Sub: "SUB", ast.Mult: "MUL"}
+        op_code = op_map[type(expr.op)]
+        return [*leftASM, f"MOV %r0 %r{pickedRegisterNum}", *rightASM, f"{op_code} %r{pickedRegisterNum} %r0 %r0"]
+    # When expr is ast.Expression
+    return codegen(expr.body)
 
 OP_TO_FUNCTION = {
     'ADD': add,
