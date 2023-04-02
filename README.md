@@ -1,4 +1,4 @@
-# Build a interpreter
+# Build an interpreter
 
 - [x] Tree-Walk evaluation stimulation of AST from Python's `ast` module
 - [x] Optimization (constant folding) of AST
